@@ -4,6 +4,7 @@ import morgan from 'morgan'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv';
 // import router from './Routes/index.js'
+import router from './Routes/index.js'
 
 
 
@@ -13,7 +14,7 @@ app.use(morgan('dev'))
 app.use(express.json())
 dotenv.config()
 
-// app.use('/api/v1',router)
+app.use('/api/v1',router)
 
 
 
@@ -24,7 +25,7 @@ const startServer = async () => {
         console.log('MongoDB connected');
         
         app.listen(process.env.PORT, () => {
-            console.log('Backend is running on port 8000');
+            console.log(`Backend is running on port ${process.env.PORT}`);
         });
     } catch (error) {
         console.error('Something went wrong:', error);
