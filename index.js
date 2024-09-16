@@ -14,6 +14,8 @@ app.use(express.json())
 dotenv.config()
 
 // app.use('/api/v1',router)
+console.log("hhhhhhh");
+
 
 
 const startServer = async () => {
