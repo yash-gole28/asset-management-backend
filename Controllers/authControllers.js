@@ -4,13 +4,13 @@ import jwt from 'jsonwebtoken'
 
 
 
-export const demo = async (req , res ) => {
-    try{
-        return res.status(200).json({success : true , message :'hello there'})
-    }catch(error){
+export const demo = async (req, res) => {
+    try {
+        return res.status(200).json({ success: true, message: 'hello there' })
+    } catch (error) {
         console.log(error)
     }
-} 
+}
 
 
 export const Register = async (req, res) => {
@@ -27,8 +27,9 @@ export const Register = async (req, res) => {
             createdBy = '',
             updatedBy = '',
 
-           
+
         } = req.body.data;
+        console.log(req.body)
         if (!email || !password || !firstName || !lastName || !role || !department) {
             return res.status(400).json({ success: false, message: 'Incomplete details or extra spaces detected' });
         }
@@ -40,15 +41,15 @@ export const Register = async (req, res) => {
             return res.status(409).json({ success: false, message: 'invalid credentials' });
         }
         console.log(findUser.role)
-         if (!findUser || !['admin', 'it'].includes(findUser.role)) {
+        if (!findUser || !['admin', 'it'].includes(findUser.role)) {
             return res.status(400).json({ success: false, message: 'Invalid role or user not found' });
         }
-        const findExistence = await authSchema.findOne({email})
+        const findExistence = await authSchema.findOne({ email })
 
-        if(findExistence){
-            return res.status(409).json({ success: false, message: 'Email already exists'})
+        if (findExistence) {
+            return res.status(409).json({ success: false, message: 'Email already exists' })
         }
-        
+
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = new authSchema({
@@ -61,7 +62,7 @@ export const Register = async (req, res) => {
             department,
             createdBy,
             updatedBy
-          
+
         });
 
         await user.save();
@@ -109,3 +110,48 @@ export const Login = async (req, res) => {
         return res.status(500).json({ success: false, message: 'An error occurred' });
     }
 };
+
+
+export const currentUser = async (req, res) => {
+    try {
+        const token = req.headers.authorization
+        console.log(token)
+        if (!token) {
+            return res.status(401).json({ message: 'No token provided' });
+        }
+
+        const parseToken = JSON.parse(token)
+        const decoded = await new Promise((resolve, reject) => {
+            jwt.verify(parseToken, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(decoded);
+                }
+            });
+        });
+        const user = await authSchema.findById(decoded.id).select('_id firstName')
+        if(!user){
+            return res.status(401).json({ message: 'user not found' });
+        }
+        return res.status(200).json({ success: true, message: 'User found', user})
+        console.log(decoded)
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+
+}
+
+export const getAllUsers = async (req , res) => {
+    try{
+        const users = await authSchema.find({}).select('_id firstName')
+        if(!users){
+            return res.status(404).json({ message: 'No users found' })
+        }
+        return res.status(200).json({ success: true, message: 'Users found', users})
+    }catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}

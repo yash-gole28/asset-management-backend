@@ -12,8 +12,6 @@ const UserSchema = new Schema({
     middleName: {
         type: String,
         trim: true,
-        minlength: [1, 'Middle name must be at least 1 character long'],
-        maxlength: [30, 'Middle name cannot exceed 30 characters']
     },
     lastName: { 
         type: String,
