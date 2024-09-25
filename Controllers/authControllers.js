@@ -1,5 +1,6 @@
 import authSchema from "../Models/authSchema.js";
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
 
 
@@ -27,7 +28,7 @@ export const Register = async (req, res) => {
             updatedBy = '',
 
            
-        } = req.body;
+        } = req.body.data;
         if (!email || !password || !firstName || !lastName || !role || !department) {
             return res.status(400).json({ success: false, message: 'Incomplete details or extra spaces detected' });
         }
@@ -72,5 +73,39 @@ export const Register = async (req, res) => {
         }
         console.error('Registration error:', error); // Log error server-side
         return res.status(500).json({ success: false, message: 'registration error' });
+    }
+};
+
+
+export const Login = async (req, res) => {
+    try {
+        const { email, password } = req.body.data;
+        console.log(req.body)
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Incomplete data' });
+        }
+
+        const getUser = await authSchema.findOne({ email }).select("name email password");
+        // console.log(getUser)
+        if (!getUser) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        const check = await bcrypt.compare(password, getUser.password);
+        if (!check) {
+            return res.status(400).json({ success: false, message: 'Wrong password' });
+        }
+
+        const token = jwt.sign(
+            { username: getUser.username, id: getUser._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
+        return res.status(200).json({ success: true, message: 'login Successful', token });
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
     }
 };
