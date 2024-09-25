@@ -2,7 +2,7 @@ import { all } from "axios";
 import assetCategorySchema from "../Models/assetCategorySchema.js";
 import assetRegistrationSchema from "../Models/assetRegistrationSchema.js";
 
-export const Categories=async (req,res)=>{
+export const AddCategories=async (req,res)=>{
     try {
         const  body=req.body;
         console.log(body);
@@ -22,7 +22,7 @@ export const Categories=async (req,res)=>{
     }
 }
 
- export const AssetsRegistration=async (req,res)=>{
+ export const AssetRegistration=async (req,res)=>{
     try {
         const {
             name="",
@@ -50,7 +50,7 @@ export const Categories=async (req,res)=>{
         })
         
          await assets.save();
-         return res.status(201).json({ success: true, message: 'AssetsRegistered successfully' });
+         return res.status(201).json({ success: true, message: 'Asset Registered successfully' });
     } catch (error) {
         console.log(error);
         res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
