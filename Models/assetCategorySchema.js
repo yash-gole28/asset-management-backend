@@ -1,7 +1,7 @@
 import mongoose, { Mongoose, Schema } from "mongoose";
 
 const Assets_Category=new Schema({
-    assets_name:{
+    category:{
         type:String,
         required:true,
     }

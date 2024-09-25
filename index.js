@@ -6,8 +6,6 @@ import dotenv from 'dotenv';
 // import router from './Routes/index.js'
 import router from './Routes/index.js'
 
-
-
 const app = express()
 app.use(cors())
 app.use(morgan('dev')) 

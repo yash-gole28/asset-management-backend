@@ -2,7 +2,8 @@ import { mongoose, Schema } from "mongoose";
 
 const Assets_Register=new Schema({
 
-    name:{type:String,
+    name:{
+        type:String,
         required:true
     },
     type:{
