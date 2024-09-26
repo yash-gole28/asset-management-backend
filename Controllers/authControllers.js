@@ -101,7 +101,7 @@ export const Login = async (req, res) => {
         const token = jwt.sign(
             { username: getUser.username, id: getUser._id },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '8h' }
         );
 
         return res.status(200).json({ success: true, message: 'login Successful', token });
@@ -125,6 +125,7 @@ export const currentUser = async (req, res) => {
             jwt.verify(parseToken, process.env.JWT_SECRET, (err, decoded) => {
                 if (err) {
                     reject(err);
+                    // return res.status(401).json({success:false , message:'token expired'})
                 } else {
                     resolve(decoded);
                 }
@@ -135,7 +136,7 @@ export const currentUser = async (req, res) => {
             return res.status(401).json({ message: 'user not found' });
         }
         return res.status(200).json({ success: true, message: 'User found', user})
-        console.log(decoded)
+
     } catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ success: false, message: 'An error occurred' });

@@ -22,13 +22,16 @@ const Assets_Register=new Schema({
     service_tag:{
         type:String,
     },
+    description:{
+        type:String,
+    },
     allocation:{
         type:Boolean,
         default:false
     },
     registered_by:{
         type:mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
     }
 
 },{

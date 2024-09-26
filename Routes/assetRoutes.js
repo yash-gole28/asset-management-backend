@@ -1,12 +1,14 @@
 import { Router } from "express";
-import { AddCategories, AssetRegistration } from "../Controllers/assetControllers.js";
+import { AddCategories, AssetRegistration, getAssets, getCategories } from "../Controllers/assetControllers.js";
 
 
 
 const router = Router()
 
 router.post('/add-category',AddCategories)
-router.post('/assetRegister',AssetRegistration)
+router.post('/register-asset',AssetRegistration)
+router.get('/get-categories',getCategories)
+router.get('/get-assets',getAssets)
 
 
 
