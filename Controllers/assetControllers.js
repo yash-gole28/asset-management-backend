@@ -1,6 +1,7 @@
 import { all } from "axios";
 import assetCategorySchema from "../Models/assetCategorySchema.js";
 import assetRegistrationSchema from "../Models/assetRegistrationSchema.js";
+import allocationsSchema from "../Models/allocationsSchema.js";
 
 export const AddCategories=async (req,res)=>{
     try {
@@ -84,6 +85,48 @@ export const AddCategories=async (req,res)=>{
             return res.status(404).json({ success: false, message: 'No assets found'})
         }
         return res.status(200).json({ success: true, message: 'Assets found', assets})
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
+        
+    }
+ }
+
+
+ export const getAssetsByCategory = async (req , res) => {
+    try{
+        const {id} = req.params
+        console.log(id)
+        const assets = await assetRegistrationSchema.find({ type: id, allocation: false }).select('name _id')
+        if(!assets){
+            return res.status(404).json({ success: false, message: 'No assets found'})
+        }
+        return res.status(200).json({ success: true, message: 'Assets found', assets})
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
+        
+    }
+ }
+
+ export const requestAsset = async (req , res) => {
+    try{
+       const {
+            employee = "",
+            assetCategory= "",
+            asset=""
+        } = req.body
+
+        const addRequest = new allocationsSchema({
+            employee_Id : employee,
+            asset_id : asset,
+        })
+        const create = await addRequest.save()
+        if(!create){
+            return res.status(404).json({ success: false, message: 'Asset request failed'})
+        }
+        return res.status(200).json({ success: true, message: 'Asset request successful',})
+
     }catch (error) {
         console.log(error);
         res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
