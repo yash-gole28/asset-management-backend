@@ -3,25 +3,49 @@ import assetCategorySchema from "../Models/assetCategorySchema.js";
 import assetRegistrationSchema from "../Models/assetRegistrationSchema.js";
 import allocationsSchema from "../Models/allocationsSchema.js";
 
-export const AddCategories=async (req,res)=>{
+
+export const AddCategories = async (req, res) => {
     try {
-        const  body=req.body;
-        console.log(body);
-        
-        const category=new assetCategorySchema(body);;
-        await category.save()
-        res.status(201).json({
-            message: 'Category created',
-            success: true
-          })
-        
+      const { name } = req.body;
+  
+      // Validate input
+      if (!name) {
+        return res.status(400).json({ message: 'Category name is required', success: false });
+      }
+  
+      // Check if the category already exists
+      const existingCategory = await assetCategorySchema.findOne({ category: name });
+  
+      if (existingCategory) {
+        return res.status(409).json({
+          message: 'Category already exists',
+          success: false,
+          category: existingCategory,
+        });
+      }
+  
+      // Create a new category if it does not exist
+      const addCategory = new assetCategorySchema({
+        category: name,
+      });
+  
+      await addCategory.save();
+  
+      // Fetch the updated list of categories
+      const categories = await assetCategorySchema.find({}).select('category');
+  
+      res.status(201).json({
+        success: true,
+        message: 'Category created',
+        categories,
+      });
+  
     } catch (error) {
-       console.log(error);
-       res.status(500).json({ message: 'INTERNAL SERVER ERROR', success: false, error: error })
-       
-        
+      console.error(error);
+      res.status(500).json({ message: 'INTERNAL SERVER ERROR', success: false, error: error });
     }
-}
+  };
+  
 
     export const getCategories = async (req , res) => {
         try{
