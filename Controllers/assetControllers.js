@@ -7,13 +7,11 @@ import allocationsSchema from "../Models/allocationsSchema.js";
 export const AddCategories = async (req, res) => {
     try {
       const { name } = req.body;
-  
-      // Validate input
+
       if (!name) {
         return res.status(400).json({ message: 'Category name is required', success: false });
       }
   
-      // Check if the category already exists
       const existingCategory = await assetCategorySchema.findOne({ category: name });
   
       if (existingCategory) {
@@ -157,3 +155,23 @@ export const AddCategories = async (req, res) => {
         
     }
  }
+
+ export const getAllRequests = async (req , res) => {
+    try{
+        const requests = await allocationsSchema.find({}).populate({
+            path:"employee_Id",
+            select:"_id firstName lastName department"
+        }).populate({
+            path:"asset_id",
+            select:"model_number service_tag name"
+        })
+        if(!requests){
+            return res.status(404).json({ success: false, message: 'No requests found'})
+        }
+        return res.status(200).json({ success: true, message: 'Requests found', requests})
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
+        
+    }
+}

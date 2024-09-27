@@ -5,7 +5,7 @@ const Assets_Allocation= new Schema({
     employee_Id:{
         required:true,
         type:mongoose.Schema.Types.ObjectId,
-        ref:"users"
+        ref:"User"
     },
     asset_id:{
         type:mongoose.Schema.Types.ObjectId,
@@ -14,7 +14,7 @@ const Assets_Allocation= new Schema({
     approved_By:{
         required:true,
         type:mongoose.Schema.Types.ObjectId,
-        ref:"users",
+        ref:"User",
     },
     issue_Date:{
         type:Date,

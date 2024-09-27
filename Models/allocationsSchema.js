@@ -4,7 +4,7 @@ const Assets_Allocation = new Schema({
     employee_Id: {
         required: true,
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "User"
     },
     asset_id: {
         type: mongoose.Schema.Types.ObjectId,
