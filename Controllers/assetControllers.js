@@ -106,6 +106,7 @@ export const AddCategories = async (req, res) => {
         if(!assets){
             return res.status(404).json({ success: false, message: 'No assets found'})
         }
+        assets.reverse()
         return res.status(200).json({ success: true, message: 'Assets found', assets})
     }catch (error) {
         console.log(error);
@@ -134,7 +135,6 @@ export const AddCategories = async (req, res) => {
     try{
        const {
             employee = "",
-            assetCategory= "",
             asset=""
         } = req.body
 
@@ -168,6 +168,33 @@ export const AddCategories = async (req, res) => {
             return res.status(404).json({ success: false, message: 'No requests found'})
         }
         return res.status(200).json({ success: true, message: 'Requests found', requests})
+    }catch (error) {
+        console.log(error);
+        res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
+        
+    }
+}
+
+export const assetRequestChange = async (req , res) => {
+    try{
+        const {requestId , action ,assetId} = req.body
+        console.log(req.body)
+        if(action === "rejected"){
+            const updateStatus = await allocationsSchema.findByIdAndUpdate(requestId ,{status:action})
+            if(!updateStatus){
+                return res.status(404).json({ success: false, message: 'Asset request failed to update'})
+            }
+            return res.status(200).json({ success: true, message: 'Asset request updated successfully'})
+        }
+        if(action === "approved"){
+            const updateStatus = await allocationsSchema.findByIdAndUpdate(requestId ,{ status:action})
+            const getAssetandUpdate = await assetRegistrationSchema.findByIdAndUpdate(assetId , {allocation:true})
+            if(!updateStatus || !getAssetandUpdate){
+                return res.status(404).json({ success: false, message: 'Asset request failed to updte'})
+            }
+            return res.status(200).json({ success: true, message: 'Asset request updated successfully'})
+        }
+
     }catch (error) {
         console.log(error);
         res.status(500).json({message:'INTERNAL SERVER ERROR',success:false,error:error})
