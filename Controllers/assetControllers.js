@@ -114,7 +114,6 @@ export const AddCategories = async (req, res) => {
     }
  }
 
-
  export const getAssetsByCategory = async (req , res) => {
     try{
         const {id} = req.params
