@@ -214,3 +214,20 @@ export const assetRequestChange = async (req , res) => {
         
     }
 }
+
+
+export const FindCtegory=async(req,res)=>{
+    try {
+        const category=await assetCategorySchema.find()
+        console.log(category)
+        if(!category){
+            return res.status(404).json({ success: false, message: 'No category found'})
+        }
+        return res.status(200).json({ success: true, message: 'all assets are find',category})
+       
+        
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message:'category Not Found'})
+    }
+}
