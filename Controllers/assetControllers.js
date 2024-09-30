@@ -167,6 +167,7 @@ export const AddCategories = async (req, res) => {
         if(!requests){
             return res.status(404).json({ success: false, message: 'No requests found'})
         }
+        requests.reverse()
         return res.status(200).json({ success: true, message: 'Requests found', requests})
     }catch (error) {
         console.log(error);
@@ -178,7 +179,19 @@ export const AddCategories = async (req, res) => {
 export const assetRequestChange = async (req , res) => {
     try{
         const {requestId , action ,assetId} = req.body
-        console.log(req.body)
+        // console.log(req.body)
+        const findAsset = await assetRegistrationSchema.findById(assetId)
+        if(!findAsset){
+            return res.status(404).json({ success: false, message: 'failed to find asset'})
+        }
+        console.log(findAsset)
+        if(findAsset.allocation == true){
+            const updateStatus = await allocationsSchema.findByIdAndUpdate(requestId ,{ status:'rejected'})
+            if(!updateStatus){
+                return res.status(404).json({ success: false, message: 'Failed to update status'})
+            }
+            return res.status(404).json({success:false , message:"asset already allocated"})
+        }
         if(action === "rejected"){
             const updateStatus = await allocationsSchema.findByIdAndUpdate(requestId ,{status:action})
             if(!updateStatus){
