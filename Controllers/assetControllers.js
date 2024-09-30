@@ -216,18 +216,37 @@ export const assetRequestChange = async (req , res) => {
 }
 
 
-export const FindCtegory=async(req,res)=>{
+
+
+export const FindCategory = async (req, res) => {
     try {
-        const category=await assetCategorySchema.find()
-        console.log(category)
-        if(!category){
-            return res.status(404).json({ success: false, message: 'No category found'})
+        // Get page and limit from query parameters
+        const page = parseInt(req.query.page) || 1; // Default to page 1
+        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+        const skip = (page - 1) * limit; // Calculate the number of documents to skip
+
+        // Get total count of categories
+        const totalCategories = await assetCategorySchema.countDocuments();
+
+        // Fetch categories with pagination
+        const categories = await assetCategorySchema.find().skip(skip).limit(limit);
+
+        // Check if any categories are found
+        if (!categories.length) {
+            return res.status(404).json({ success: false, message: 'No categories found' });
         }
-        return res.status(200).json({ success: true, message: 'all assets are find',category})
-       
+
+        return res.status(200).json({
+            success: true,
+            message: 'Categories fetched successfully',
+            categories,
+            total: totalCategories,
+            currentPage: page,
+            totalPages: Math.ceil(totalCategories / limit), // Calculate total pages
+        });
         
     } catch (error) {
         console.log(error);
-        res.status(500).json({message:'category Not Found'})
+        res.status(500).json({ message: 'Error retrieving categories' });
     }
-}
+};
