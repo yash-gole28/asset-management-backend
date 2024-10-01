@@ -12,4 +12,5 @@ router.get('/all-users',getAllUsers)
 router.get('/all-active-users',getAllActiveUsers)
 router.put('/change-active-user',changeActiveUser)
 
+
 export default router

@@ -2,16 +2,18 @@ import { all } from "axios";
 import assetCategorySchema from "../Models/assetCategorySchema.js";
 import assetRegistrationSchema from "../Models/assetRegistrationSchema.js";
 import allocationsSchema from "../Models/allocationsSchema.js";
+import jwt from 'jsonwebtoken'
 
 
 export const AddCategories = async (req, res) => {
     try {
-      const { name } = req.body;
+       
 
+      const { name } = req.body;
       if (!name) {
         return res.status(400).json({ message: 'Category name is required', success: false });
       }
-  
+    
       const existingCategory = await assetCategorySchema.findOne({ category: name });
   
       if (existingCategory) {
@@ -21,21 +23,43 @@ export const AddCategories = async (req, res) => {
           category: existingCategory,
         });
       }
+
+      const token = req.headers.authorization
+      console.log(token);
+      
+      if (!token) {
+        return res.status(401).json({ message: 'No token provided' });
+      }
+      const parseToken = JSON.parse(token)
+        let decoded = await new Promise((resolve, reject) => {
+            jwt.verify(parseToken, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    reject(err);
+                    // return res.status(401).json({success:false , message:'token expired'})
+                } else {
+                    resolve(decoded);
+                }
+            });
+        });
+        console.log(decoded);
+    
   
-      // Create a new category if it does not exist
+     
       const addCategory = new assetCategorySchema({
         category: name,
+        createdBy: decoded.id
       });
   
       await addCategory.save();
-  
-      // Fetch the updated list of categories
-      const categories = await assetCategorySchema.find({}).select('category');
+    if (!addCategory) {
+        res.status(404).json({ message: 'Failed to save Category', success: false });
+    }
+    //   const categories = await assetCategorySchema.find({}).select('category');
   
       res.status(201).json({
         success: true,
         message: 'Category created',
-        categories,
+     
       });
   
     } catch (error) {
@@ -250,3 +274,40 @@ export const FindCategory = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving categories' });
     }
 };
+
+export const getAllActiveCategory = async (req , res) => {
+    try{
+        const category = await assetCategorySchema.find({active:true}).select('_id category')
+        console.log(category)
+        if(!category){
+            return res.status(404).json({ message: 'No category found' })
+        }
+        return res.status(200).json({ success: true, message: 'category found', category,})
+    }catch (error) {
+        console.error('error', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}
+
+export const changeActiveCategory = async (req, res) => {
+    try{
+        const { _id } = req.body;
+        if (!_id) {
+            return res.status(400).json({ success: false, message: 'id is required' });
+        }
+
+        const category = await assetCategorySchema.findById(_id);
+        if (!category) {
+            return res.status(404).json({ success: false, message: 'category not found' });
+        }
+
+        category.active = !category.active;
+
+        await category.save();
+
+        return res.status(200).json({ success: true, message:'category updated' });
+    }catch (error) {
+        console.error(' error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}
