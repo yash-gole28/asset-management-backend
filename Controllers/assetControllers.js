@@ -253,7 +253,10 @@ export const FindCategory = async (req, res) => {
         const totalCategories = await assetCategorySchema.countDocuments();
 
         // Fetch categories with pagination
-        const categories = await assetCategorySchema.find().skip(skip).limit(limit);
+        const categories = await assetCategorySchema.find().populate({
+              path: 'createdBy',
+            select: 'firstName lastName'
+        }).skip(skip).limit(limit);
 
         // Check if any categories are found
         if (!categories.length) {
