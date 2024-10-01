@@ -48,26 +48,34 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
-    active:{
-        type:Boolean,
-        default:true
+    active: {
+        type: Boolean,
+        default: true
     },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        
     },
     updatedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-       
     }
 }, {
     timestamps: true
 });
 
-// Middleware to handle empty strings and default values
 
+UserSchema.pre('save', function(next) {
+    if (this.isModified('firstName')) {
+        this.firstName = this.firstName.charAt(0).toUpperCase() + this.firstName.slice(1).toLowerCase();
+    }
+    if (this.isModified('middleName') && this.middleName) {
+        this.middleName = this.middleName.charAt(0).toUpperCase() + this.middleName.slice(1).toLowerCase();
+    }
+    if (this.isModified('lastName')) {
+        this.lastName = this.lastName.charAt(0).toUpperCase() + this.lastName.slice(1).toLowerCase();
+    }
+    next();
+});
 
-// Create and export the model
 export default mongoose.model('User', UserSchema);
