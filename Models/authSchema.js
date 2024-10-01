@@ -48,14 +48,18 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    active:{
+        type:Boolean,
+        default:true
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         
     },
     updatedBy: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
        
     }
 }, {

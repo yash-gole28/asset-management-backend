@@ -81,16 +81,20 @@ export const Register = async (req, res) => {
 export const Login = async (req, res) => {
     try {
         const { email, password } = req.body.data;
-        console.log(req.body)
+        // console.log(req.body)
 
         if (!email || !password) {
             return res.status(400).json({ success: false, message: 'Incomplete data' });
         }
 
-        const getUser = await authSchema.findOne({ email }).select("name email password");
+        const getUser = await authSchema.findOne({ email }).select("name email password active");
         // console.log(getUser)
         if (!getUser) {
             return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        console.log(getUser)
+        if(getUser.active === false){
+            return res.status(404).json({success:false, message:'user not active'})
         }
 
         const check = await bcrypt.compare(password, getUser.password);
@@ -146,11 +150,48 @@ export const currentUser = async (req, res) => {
 
 export const getAllUsers = async (req , res) => {
     try{
-        const users = await authSchema.find({}).select('_id firstName lastName')
+        const users = await authSchema.find({}).select('_id firstName lastName email department active role')
         if(!users){
             return res.status(404).json({ message: 'No users found' })
         }
         return res.status(200).json({ success: true, message: 'Users found', users})
+    }catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}
+
+export const getAllActiveUsers = async (req , res) => {
+    try{
+        const users = await authSchema.find({active:true}).select('_id firstName lastName')
+        console.log(users)
+        if(!users){
+            return res.status(404).json({ message: 'No users found' })
+        }
+        return res.status(200).json({ success: true, message: 'Users found', users})
+    }catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}
+
+export const changeActiveUser = async (req, res) => {
+    try{
+        const { id } = req.body;
+        if (!id) {
+            return res.status(400).json({ success: false, message: 'id is required' });
+        }
+
+        const user = await authSchema.findById(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        user.active = !user.active;
+
+        await user.save();
+
+        return res.status(200).json({ success: true, message:'user updated' });
     }catch (error) {
         console.error('Login error:', error);
         return res.status(500).json({ success: false, message: 'An error occurred' });
