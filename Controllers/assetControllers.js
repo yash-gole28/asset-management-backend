@@ -314,3 +314,35 @@ export const changeActiveCategory = async (req, res) => {
         return res.status(500).json({ success: false, message: 'An error occurred' });
     }
 }
+
+export const getUserAssets = async (req, res) => {
+    try{
+        const token = req.headers.authorization
+        const parseToken = JSON.parse(token)
+        const decoded = await new Promise((resolve, reject) => {
+            jwt.verify(parseToken, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    reject(err);
+                    // return res.status(401).json({success:false , message:'token expired'})
+                } else {
+                    resolve(decoded);
+                }
+            });
+        });
+        const assets = await allocationsSchema.find({employee_Id:decoded.id , status:'approved'}).select('asset_id updatedAt').populate({
+            path: 'asset_id',
+            select:'name type company model_number service_tag ',
+            populate:{
+                path:'type',
+                select:'category'
+            }
+        })
+        if(!assets){
+            return res.status(404).json({ success: false, message: 'No assets found'})
+        }
+        return res.status(200).json({ success: true, message: 'assets found', assets})
+    }catch (error) {
+        console.error(' error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}

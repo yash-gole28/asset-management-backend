@@ -197,3 +197,30 @@ export const changeActiveUser = async (req, res) => {
         return res.status(500).json({ success: false, message: 'An error occurred' });
     }
 }
+
+export const getProfileDetails = async(req, res) => {
+    try{
+        const token = req.headers.authorization
+        console.log(token)
+        const parseToken = JSON.parse(token)
+        const decoded = await new Promise((resolve, reject) => {
+            jwt.verify(parseToken, process.env.JWT_SECRET, (err, decoded) => {
+                if (err) {
+                    reject(err);
+                    // return res.status(401).json({success:false , message:'token expired'})
+                } else {
+                    resolve(decoded);
+                }
+            });
+        });
+        const user = await authSchema.findById(decoded.id).select('-password')
+        if(!user){
+            return res.status(404).json({ success: false, message: 'User not found'})
+        }
+        
+        return res.status(200).json({ success: true, message: 'User profile found',user})
+    }catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}

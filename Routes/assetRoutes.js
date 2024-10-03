@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { AddCategories, AssetRegistration, assetRequestChange, changeActiveCategory,
      FindCategory,getAllActiveCategory,getAllRequests,
-     getAssets, getAssetsByCategory, getCategories, requestAsset } from "../Controllers/assetControllers.js";
+     getAssets, getAssetsByCategory, getCategories, getUserAssets, requestAsset } from "../Controllers/assetControllers.js";
 
 
 
@@ -18,5 +18,7 @@ router.post('/update-request',assetRequestChange)
 router.get('/get-allcategory',FindCategory )
 router.get('/all-active-category',getAllActiveCategory)
 router.put('/change-active-category',changeActiveCategory)
+router.get('/get-user-assets',getUserAssets)
+
 
 export default router
