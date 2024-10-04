@@ -294,12 +294,12 @@ export const getAllActiveCategory = async (req , res) => {
 
 export const changeActiveCategory = async (req, res) => {
     try{
-        const { _id } = req.body;
-        if (!_id) {
+        const { id } = req.body;
+        if (!id) {
             return res.status(400).json({ success: false, message: 'id is required' });
         }
 
-        const category = await assetCategorySchema.findById(_id);
+        const category = await assetCategorySchema.findById(id);
         if (!category) {
             return res.status(404).json({ success: false, message: 'category not found' });
         }

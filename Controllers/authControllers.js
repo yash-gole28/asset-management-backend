@@ -135,7 +135,7 @@ export const currentUser = async (req, res) => {
                 }
             });
         });
-        const user = await authSchema.findById(decoded.id).select('_id firstName role')
+        const user = await authSchema.findById(decoded.id).select('_id firstName lastName role')
         if(!user){
             return res.status(401).json({ message: 'user not found' });
         }
