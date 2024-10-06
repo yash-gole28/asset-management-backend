@@ -3,6 +3,7 @@ import assetCategorySchema from "../Models/assetCategorySchema.js";
 import assetRegistrationSchema from "../Models/assetRegistrationSchema.js";
 import allocationsSchema from "../Models/allocationsSchema.js";
 import jwt from 'jsonwebtoken'
+import { request } from "express";
 
 
 export const AddCategories = async (req, res) => {
@@ -200,6 +201,31 @@ export const AddCategories = async (req, res) => {
     }
 }
 
+export const getLimitedRequests = async (req, res) => {
+    try {
+        const requests = await allocationsSchema.find({})
+            .populate({
+                path: "employee_Id",
+                select: "_id firstName lastName department"
+            })
+            .populate({
+                path: "asset_id",
+                select: "model_number service_tag name"
+            })
+            .sort({ createdAt: -1 }) // Sort by createdAt in descending order (latest first)
+            .limit(5); // Limit to the last 5 entries
+
+        if (!requests || requests.length === 0) {
+            return res.status(404).json({ success: false, message: 'No requests found' });
+        }
+
+        return res.status(200).json({ success: true, message: 'Requests found', requests });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'INTERNAL SERVER ERROR', success: false, error });
+    }
+};
+
 export const assetRequestChange = async (req , res) => {
     try{
         const {requestId , action ,assetId} = req.body
@@ -341,6 +367,15 @@ export const getUserAssets = async (req, res) => {
             return res.status(404).json({ success: false, message: 'No assets found'})
         }
         return res.status(200).json({ success: true, message: 'assets found', assets})
+    }catch (error) {
+        console.error(' error:', error);
+        return res.status(500).json({ success: false, message: 'An error occurred' });
+    }
+}
+
+export const getKpiData = async (req, res) => {
+    try{
+        
     }catch (error) {
         console.error(' error:', error);
         return res.status(500).json({ success: false, message: 'An error occurred' });
