@@ -29,7 +29,7 @@ export const Register = async (req, res) => {
 
 
         } = req.body.data;
-        console.log(req.body)
+        // console.log(req.body)
         if (!email || !password || !firstName || !lastName || !role || !department) {
             return res.status(400).json({ success: false, message: 'Incomplete details or extra spaces detected' });
         }
@@ -40,7 +40,7 @@ export const Register = async (req, res) => {
 
             return res.status(409).json({ success: false, message: 'invalid credentials' });
         }
-        console.log(findUser.role)
+        // console.log(findUser.role)
         if (!findUser || !['admin', 'it'].includes(findUser.role)) {
             return res.status(400).json({ success: false, message: 'Invalid role or user not found' });
         }
@@ -164,7 +164,7 @@ export const getAllUsers = async (req , res) => {
 export const getAllActiveUsers = async (req , res) => {
     try{
         const users = await authSchema.find({active:true}).select('_id firstName lastName')
-        console.log(users)
+        // console.log(users)
         if(!users){
             return res.status(404).json({ message: 'No users found' })
         }
@@ -201,7 +201,7 @@ export const changeActiveUser = async (req, res) => {
 export const getProfileDetails = async(req, res) => {
     try{
         const token = req.headers.authorization
-        console.log(token)
+        // console.log(token) 
         const parseToken = JSON.parse(token)
         const decoded = await new Promise((resolve, reject) => {
             jwt.verify(parseToken, process.env.JWT_SECRET, (err, decoded) => {

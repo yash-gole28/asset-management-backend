@@ -375,7 +375,20 @@ export const getUserAssets = async (req, res) => {
 
 export const getKpiData = async (req, res) => {
     try{
-        
+        const allocatedCount = await assetRegistrationSchema.countDocuments({ allocation: true });
+
+        const notAllocatedCount = await assetRegistrationSchema.countDocuments({ allocation: false });
+
+        if(!allocatedCount || !notAllocatedCount){
+            return res.status(404).json({ success: false, message: 'No data found'})
+        }
+        return res.status(200).json({
+            success: true,
+            data: {
+                allocatedCount,
+                notAllocatedCount
+            }
+        });
     }catch (error) {
         console.error(' error:', error);
         return res.status(500).json({ success: false, message: 'An error occurred' });
